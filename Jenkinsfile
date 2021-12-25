@@ -16,7 +16,7 @@ node {
       secret text and add credentials & remember the id 
     */
     withCredentials([string(credentialsId: 'dockerhub_passwd', variable: 'dockerhub_passwd')]) {
-    sh 'docker login -u vikashashoke -p ${dockerhub_passwd}'
+    sh "docker login -u vikashashoke -p ${dockerhub_passwd}"
     sh 'docker image push vikashashoke/$JOB_NAME:v1.$BUILD_ID'
     sh 'docker image push vikashashoke/$JOB_NAME:latest'
     //A number of images will get stored into our jenkins server so need to remove prev build images
@@ -26,10 +26,12 @@ node {
     }
     stage("Docker Container Deployment")
     {
+        //defining variables and using
+        //*** whereever using variables please must use double quotations ""
         def docker_run = 'docker run -p 8000:80 -d --name dockercontainer vikashashoke/scripted-pipeline-demo:latest'
         // container deployment need to be done on remote host server DOCKER-Host so ssh-Agent plugin required in jenkins
        sshagent(['dockerhost_passwd']) {
-    sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.15.56 ${docker_run}'
+    sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.15.56 ${docker_run}"
        }
     }
     
