@@ -1,0 +1,23 @@
+node {
+    
+    stage('Git checkout'){
+        git 'https://github.com/vikash-kumar01/Kubernetes_Project.git'
+    }
+    
+    stage('Sending Dockerfile from jenkins to Ansible over ssh'){
+        sshagent(['ansible']) {
+         sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110'
+         sh 'scp /var/lib/jenkins/workspace/pipeline-demo/* ubuntu@172.31.1.110:/home/ubuntu/'
+        }
+    }
+    
+    stage('Building Docker Image'){
+        
+       sshagent(['ansible']) {
+         sh 'echo "$PWD" '
+         sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 cd /home/ubuntu/'
+         sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 docker image build -t $JOB_NAME:v1.$BUILD_ID .'
+       
+    }
+    }
+}
