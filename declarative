@@ -29,13 +29,12 @@ node {
          }
     }
     
-    stage('push docker images to docker hub'){
-        
+     stage('push docker images to docker hub'){
+      sshagent(['ansible_demo']) {
             withCredentials([string(credentialsId: 'dockerhub_passwd', variable: 'dockerhub_passwd')]) {
-                sh "docker login -u vikashashoke -p ${dockerhub_passwd}"
-                sshagent(['ansible_demo']) {
-              sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 docker image push vikashashoke/$JOB_NAME:v1.$BUILD_ID '
-               sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 docker image push vikashashoke/$JOB_NAME:latest '
+                 sh "ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 docker login -u vikashashoke -p ${dockerhub_passwd}"
+                 sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 docker image push vikashashoke/$JOB_NAME:v1.$BUILD_ID '
+                 sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 docker image push vikashashoke/$JOB_NAME:latest '
                             
              }
              
