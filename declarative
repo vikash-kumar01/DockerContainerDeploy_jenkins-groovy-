@@ -40,4 +40,19 @@ node {
              
           }
     }
+    
+    stage('copy files from Jenkins to Kubernetes server'){
+      sshagent(['kubernetes_server']) {
+             sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.111'
+             sh 'scp /var/lib/jenkins/workspace/pipeline-demo/* ubuntu@172.31.1.111:/home/ubuntu/'                                                                            
+          }
+    }
+    stage('Kubernetes deployment by running ansible playbook'){
+      sshagent(['ansible_demo']) {
+      //Make sure Yo're installing ansible as ubuntu user insted of root and make ssh connection too with ubuntu user & set passwd for ubuntu too
+             sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 ansible -m ping kube_node'     
+              sh 'ssh -o StrictHostKeyChecking=no ubuntu@172.31.1.110 ansible-playbook ansible.yml'    
+          }
+    }
+    
 }
